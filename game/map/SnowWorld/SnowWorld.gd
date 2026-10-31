@@ -14,7 +14,7 @@ func _ready() -> void:
 	PlayerServer.setPlayerPosition($CreatePosition.global_position)
 	Utils.gameStart()
 	Utils.crosshairChange(false)
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	Utils.set_menu_mouse()
 
 func onGameStart():
 	$ControlUI.visible = true
@@ -27,7 +27,7 @@ func onGameStart():
 	
 func onMonsterJoin():
 	Utils.crosshairChange(true)
-	Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
+	Utils.set_gameplay_mouse()
 	builder.start()
 	
 	EquipServer.addEquipOnFloor(preload("res://game/equip/High-Energy Particle Cannon.tscn").instantiate(),Utils.player.global_position)

@@ -1,2 +1,5 @@
 # Godot 4+ specific ignores
 .godot/
+
+# Web export output. GitHub Actions rebuilds this.
+build/

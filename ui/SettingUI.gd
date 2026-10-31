@@ -43,7 +43,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("ui_cancel") && !Utils.is_inv_show:
 		if Utils.is_game_start && !visible:
 			show()
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+			Utils.set_menu_mouse()
 			Utils.crosshairChange(false)
 			get_tree().paused = true
 		elif visible:
@@ -52,7 +52,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				get_tree().paused = false
 				if Utils.is_game_start:
 					Utils.crosshairChange(true)
-					Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
+					Utils.set_gameplay_mouse()
 			
 	
 

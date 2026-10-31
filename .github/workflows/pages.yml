@@ -1,0 +1,86 @@
+name: Deploy Web
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  GODOT_VERSION: 4.7.2
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Godot export templates
+        id: godot-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/godot
+          key: godot-${{ env.GODOT_VERSION }}-linux
+
+      - name: Install Godot
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y wget unzip fontconfig libx11-6 libxcursor1 libxinerama1 libxi6 libxrandr2 libxext6 libxrender1 libgl1
+          wget -q "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q "Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          sudo mv "Godot_v${GODOT_VERSION}-stable_linux.x86_64" /usr/local/bin/godot
+          sudo chmod +x /usr/local/bin/godot
+          if [[ ! -d "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable" ]]; then
+            wget -q "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+            mkdir -p "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+            unzip -q "Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+            mv templates/* "$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable/"
+          fi
+
+      - name: Export Web
+        run: |
+          set -euo pipefail
+          mkdir -p build/web
+          # GitHub Pages 不能加 COOP/COEP 头，多线程 Web 导出会无法启动。
+          sed -i 's#variant/thread_support=true#variant/thread_support=false#' export_presets.cfg
+          godot --headless --import || true
+          if [[ ! -d .godot/imported ]]; then
+            echo "Godot import failed"
+            exit 1
+          fi
+          set +e
+          godot --headless --export-release "Web" "$GITHUB_WORKSPACE/build/web/index.html"
+          export_code=$?
+          set -e
+          if [[ ! -f build/web/index.html || ! -f build/web/index.wasm || ! -f build/web/index.pck ]]; then
+            echo "Web export failed (exit ${export_code})"
+            exit 1
+          fi
+          touch build/web/.nojekyll
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

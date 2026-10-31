@@ -18,11 +18,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if Input.is_action_just_pressed("e") && $Button.visible && !is_add:
 		var ins = reward_shop_pre.instantiate()
 		ins.tree_exited.connect(func tree_exited():
-			Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
+			Utils.set_gameplay_mouse()
 			Utils.crosshairChange(true)
 			is_add = false)
 		ins.tree_entered.connect(func tree_entered():
-			Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+			Utils.set_menu_mouse()
 			Utils.crosshairChange(false)
 			is_add = true)
 		Utils.canvasLayer.add_child(ins)

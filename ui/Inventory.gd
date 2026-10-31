@@ -16,13 +16,13 @@ var choose_gun :BaseGun = Utils.player.gun
 
 func _enter_tree() -> void:
 	Utils.is_inv_show = true
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	Utils.set_menu_mouse()
 	await get_tree().create_timer(0.1).timeout
 	get_tree().paused = true
 
 func _exit_tree() -> void:
 	if !Utils.pause_state:
-		Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
+		Utils.set_gameplay_mouse()
 		get_tree().paused = false
 	Utils.is_inv_show = false
 	

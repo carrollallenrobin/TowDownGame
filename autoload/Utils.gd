@@ -108,6 +108,29 @@ func gameStart():
 	is_game_start = true
 	emit_signal("onGameStart")
 
+var gameplay_mouse := false
+
+# Web 不支持把光标限制在窗口内，而且多线程导出里 Input.mouse_mode 读回来始终是可见。
+# 战斗状态用自己的标记判断，桌面端仍按实际鼠标模式判断。
+func gameplay_mouse_mode() -> Input.MouseMode:
+	if OS.has_feature("web"):
+		return Input.MOUSE_MODE_HIDDEN
+	return Input.MOUSE_MODE_CONFINED_HIDDEN
+
+func set_gameplay_mouse() -> void:
+	gameplay_mouse = true
+	Input.mouse_mode = gameplay_mouse_mode()
+
+func set_menu_mouse() -> void:
+	gameplay_mouse = false
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+
+func is_gameplay_mouse() -> bool:
+	if OS.has_feature("web"):
+		return gameplay_mouse
+	var mode := Input.mouse_mode
+	return mode == Input.MOUSE_MODE_HIDDEN or mode == Input.MOUSE_MODE_CONFINED_HIDDEN
+
 #伤害数字
 func showHitLabel(num,traget:Node2D):
 	var ins = hitlabel.instantiate()

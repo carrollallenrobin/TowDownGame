@@ -56,7 +56,7 @@ func _on_button_3_pressed():
 #玩家升级动作
 func onPlayerLevelChange(level):
 	Utils.crosshairChange(false)
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	Utils.set_menu_mouse()
 	Utils.pause_state = true
 	get_tree().paused = true
 	await get_tree().create_timer(1).timeout
@@ -70,7 +70,7 @@ func onPlayerLevelChange(level):
 func choose_select():
 	level_choose_bg.visible = false
 	Utils.crosshairChange(true)
-	Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
+	Utils.set_gameplay_mouse()
 	Utils.pause_state = false
 	for item in choose_box.get_children():
 		item.queue_free()

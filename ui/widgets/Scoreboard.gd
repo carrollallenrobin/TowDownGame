@@ -10,11 +10,11 @@ var data
 
 func _enter_tree() -> void:
 	Utils.crosshairChange(false)
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	Utils.set_menu_mouse()
 
 func _exit_tree() -> void:
 	Utils.crosshairChange(true)
-	Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
+	Utils.set_gameplay_mouse()
 
 func _ready() -> void:
 	time.text = "%s: %s" %[tr("SURVIVAL TIME"),int(data["time"])]

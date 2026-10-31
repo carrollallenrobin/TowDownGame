@@ -12,11 +12,11 @@ var choose_id = null
 var choose_am : BaseAttachment= null
 
 func _enter_tree():
-	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	Utils.set_menu_mouse()
 	Utils.crosshairChange(false)
 
 func _exit_tree():
-	Input.mouse_mode = Input.MOUSE_MODE_CONFINED_HIDDEN
+	Utils.set_gameplay_mouse()
 	Utils.crosshairChange(true)
 
 func _ready() -> void:
